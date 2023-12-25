@@ -3,6 +3,10 @@ package interface_adapter.logged_in;
 import interface_adapter.StartPage.StartPageViewModel;
 import interface_adapter.ViewModel;
 import interface_adapter.login.LoginState;
+// In StartPageView.java
+import interface_adapter.ViewManagerModel;
+import view.LoggedInView;
+
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -16,8 +20,11 @@ public class LoggedInViewModel extends ViewModel {
     public static final String HOMEPAGE_BUTTON_LABEL = "Home Page";
     private String loggedInUser;
 
-    public LoggedInViewModel() {
+    private final LoginState loginState;
+
+    public LoggedInViewModel(LoginState loginState) {
         super("logged in");
+        this.loginState = loginState;
     }
 
     public void setState(LoggedInState state) {
@@ -49,4 +56,9 @@ public class LoggedInViewModel extends ViewModel {
     public void setLoggedInUser(String loggedInUser) {
         this.loggedInUser = loggedInUser;
     }
+
+    public LoginState getLoginState() {
+        return loginState;
+    }
+
 }

@@ -5,13 +5,11 @@ import interface_adapter.StartPage.StartPageViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.Workout.WorkoutViewModel;
 
-import interface_adapter.logged_in.LoggedInState;
-import interface_adapter.login.LoginController;
-import interface_adapter.login.LoginState;
-import interface_adapter.login.LoginViewModel;
-import interface_adapter.signup.SignupViewModel;
-import use_case.login.LoginInputData;
 import interface_adapter.CalorieCounter.CalorieCounterViewModel;
+import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.ViewManagerModel;
+import view.LoggedInView;
+
 
 
 import javax.swing.*;
@@ -34,23 +32,25 @@ public class StartPageView extends JPanel implements ActionListener, PropertyCha
     private final JButton viewSavedRecipesButton;
     private final JButton workoutSearchButton;
     private final JButton calorieCounterButton;
-    private final JButton signUpButton;
-    private final JButton loginButton;
     private final JButton userScreenButton;
-
-    private final LoginViewModel loginViewModel;
 
     private boolean addedToWindow = false;
 
-    public StartPageView(StartPageViewModel startPageViewModel, RecipeSearchController recipeSearchController,
-                         WorkoutViewModel workoutViewModel, LoginViewModel loginViewModel,
-                         ViewManagerModel viewManagerModel, SignupViewModel signupViewModel,
-                         CalorieCounterViewModel calorieCounterViewModel) {
+    private ViewManagerModel viewManagerModel;
+    private LoggedInView loggedInView;
 
-        this.loginViewModel = loginViewModel;
+    public void setViewManagerAndLoggedIn(ViewManagerModel viewManagerModel, LoggedInView loggedInView) {
+        this.viewManagerModel = viewManagerModel;
+        this.loggedInView = loggedInView;
+    }
+
+    public StartPageView(StartPageViewModel startPageViewModel, RecipeSearchController recipeSearchController,
+                         WorkoutViewModel workoutViewModel,
+                         ViewManagerModel viewManagerModel,
+                         CalorieCounterViewModel calorieCounterViewModel, LoggedInView loggedInView, LoggedInViewModel loggedInViewModel) {
+
         this.startPageViewModel = startPageViewModel;
         this.recipeSearchController = recipeSearchController;
-
         this.startPageViewModel.addPropertyChangeListener(this);
 
         JLabel title = new JLabel(startPageViewModel.TITLE_LABEL);
@@ -63,16 +63,12 @@ public class StartPageView extends JPanel implements ActionListener, PropertyCha
         viewSavedRecipesButton = createStyledButton(startPageViewModel.view_saved_BUTTON_LABEL, "src/savedr.png");
         workoutSearchButton = createStyledButton(startPageViewModel.Workout_BUTTON_LABEL, "src/worko.png");
         calorieCounterButton = createStyledButton(startPageViewModel.Calorie_counter_BUTTON_LABEL, "src/calk.png");
-        signUpButton = createStyledButton(startPageViewModel.sign_up_BUTTON_LABEL, "src/signu.png");
-        loginButton = createStyledButton(startPageViewModel.login_BUTTON_LABEL, "src/login.png");
         usernameLabel = new JLabel(startPageViewModel.username_Button_Label);
         userScreenButton = createStyledButton(startPageViewModel.USER_SCREEN_BUTTON_LABEL, "src/user.png");
 
         // Add action listeners
-        userScreenButton.addActionListener(e -> {
-            viewManagerModel.setActiveView("logged in");
-            viewManagerModel.firePropertyChanged();
-        });
+
+        userScreenButton.addActionListener(this::actionPerformed);
 
         viewSavedRecipesButton.addActionListener(e -> readLatestRecipeData());
 
@@ -83,23 +79,14 @@ public class StartPageView extends JPanel implements ActionListener, PropertyCha
             viewManagerModel.firePropertyChanged();
         });
 
-        signUpButton.addActionListener(e -> {
-            viewManagerModel.setActiveView(signupViewModel.getViewName());
-            viewManagerModel.firePropertyChanged();
-        });
-
-        loginButton.addActionListener(e -> {
-            viewManagerModel.setActiveView(loginViewModel.getViewName());
-            viewManagerModel.firePropertyChanged();
-        });
 
         workoutSearchButton.addActionListener(e -> {
             viewManagerModel.setActiveView(workoutViewModel.getViewName());
             viewManagerModel.firePropertyChanged();
         });
 
-        JPanel buttonPanel1 = createButtonPanel(signUpButton, loginButton, userScreenButton);
-        JPanel buttonPanel2 = createButtonPanel(planMealButton, recipeSearchButton, viewSavedRecipesButton);
+        JPanel buttonPanel1 = createButtonPanel(userScreenButton);
+        JPanel buttonPanel2 = createButtonPanel(recipeSearchButton, viewSavedRecipesButton);
         JPanel buttonPanel3 = createButtonPanel(workoutSearchButton, calorieCounterButton);
 
         this.setLayout(new BorderLayout());
@@ -184,23 +171,25 @@ public class StartPageView extends JPanel implements ActionListener, PropertyCha
     /**
      * React to a button click that results in evt.
      */
+    @Override
     public void actionPerformed(ActionEvent evt) {
-        JOptionPane.showConfirmDialog(this, "Cancel not implemented yet.");
+        try {
+            System.out.println("Button clicked!");
+            if (evt.getSource().equals(userScreenButton)) {
+                System.out.println("Switching to logged in view");
+                viewManagerModel.setActiveView(loggedInView.viewName);
+                viewManagerModel.firePropertyChanged();
+                System.out.println("Active view set to: " + viewManagerModel.getActiveView());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        LoginState currentState = loginViewModel.getState();
-
-//        String username = currentState.getUsername();
-//
-//        if (username != null && !username.isEmpty()) {
-//            System.out.println("Logged in as: " + username);
-//        } else {
-//            System.out.println("Not Logged in ");
-//        }
-
-
     }
 
 
@@ -242,3 +231,5 @@ public class StartPageView extends JPanel implements ActionListener, PropertyCha
     }
 
 }
+
+

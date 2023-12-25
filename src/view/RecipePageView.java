@@ -39,7 +39,7 @@ public class RecipePageView extends JPanel implements ActionListener, PropertyCh
     private final JList<String> MealTypeComboBox;
     private final JList<String> dietLabelList;
     private final JList<String> healthLabelList;
-    private final JLabel caloriesValueLabel = new JLabel("Calories: 0");
+    private final JLabel caloriesValueLabel = new JLabel("Calories: 1500");
     private final JLabel selectedDietLabelsLabel = new JLabel();
     private Image backgroundImage;
 

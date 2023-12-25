@@ -6,7 +6,10 @@ import interface_adapter.logged_in.LoggedInViewModel;
 import use_case.login.LoginOutputBoundary;
 import use_case.login.LoginOutputData;
 
+import javax.swing.*;
+
 public class LoginPresenter implements LoginOutputBoundary {
+
 
     private final LoginViewModel loginViewModel;
     private final LoggedInViewModel loggedInViewModel;
@@ -23,26 +26,25 @@ public class LoginPresenter implements LoginOutputBoundary {
     @Override
     public void prepareSuccessView(LoginOutputData response) {
         // On success, switch to the logged in view.
-
         LoggedInState loggedInState = loggedInViewModel.getState();
         loggedInState.setUsername(response.getUsername());
-        this.loggedInViewModel.setState(loggedInState);
-        this.loggedInViewModel.firePropertyChanged();
+        loggedInViewModel.setState(loggedInState);
+        loggedInViewModel.firePropertyChanged();
 
-//
-        this.viewManagerModel.setActiveView(loggedInViewModel.getViewName());
-        this.viewManagerModel.firePropertyChanged();
+        // Set loggedIn to true
+        loginViewModel.getState().setLoggedIn(true);
+        loginViewModel.firePropertyChanged();
 
-//        this.viewManagerModel.setLoggedInUsername(response.getUsername());
-//        this.viewManagerModel.setActiveView("start page");
-//        this.viewManagerModel.firePropertyChanged();
-
+        viewManagerModel.setActiveView(loggedInViewModel.getViewName());
+        viewManagerModel.firePropertyChanged();
     }
+
 
     @Override
     public void prepareFailView(String error) {
         LoginState loginState = loginViewModel.getState();
         loginState.setUsernameError(error);
+        loginState.setErrorMessage("Incorrect Credentials! Try Again");
         loginViewModel.firePropertyChanged();
     }
 }

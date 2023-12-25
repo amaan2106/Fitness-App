@@ -11,8 +11,7 @@ import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.StringJoiner;
+import java.util.List;
 import javax.swing.border.EmptyBorder;
 
 public class RecipeSeatchButtonPresenter implements RecipeSearchButtonOutputBoundary {
@@ -23,7 +22,6 @@ public class RecipeSeatchButtonPresenter implements RecipeSearchButtonOutputBoun
     }
 
     private void saveRecipeData(Recipe recipe) {
-
         String csvFile = "./saved_recipes.csv";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile, true))) {
             // Format data for CSV
@@ -43,7 +41,6 @@ public class RecipeSeatchButtonPresenter implements RecipeSearchButtonOutputBoun
         }
     }
 
-
     @Override
     public void presentrecipe(Recipe recipe) {
         // Create a custom JPanel with BorderLayout
@@ -62,8 +59,11 @@ public class RecipeSeatchButtonPresenter implements RecipeSearchButtonOutputBoun
 
         addLabelAndDetails(detailsPanel, gbc, "Recipe Name:", " " + recipe.getRecipeName() + "\n\n");
         addLabelAndDetails(detailsPanel, gbc, "Calories:", " " + String.format("%.2f", recipe.getCalories()) + "\n\n");
-        addLabelAndDetails(detailsPanel, gbc, "Diet Labels:", " " + String.join(", ", recipe.getDietLabels()) + "\n\n");
-        addLabelAndDetails(detailsPanel, gbc, "Health Labels:", " " + String.join(", ", recipe.getHealthLabels()) + "\n\n");
+        JButton btnHealthLabels = new JButton("Health Labels");
+        JButton btnDietLabels = new JButton("Diet Labels");
+
+        btnHealthLabels.addActionListener(e -> showLabels("Health Labels", String.join(", ", recipe.getHealthLabels() + "\n\n")));
+        btnDietLabels.addActionListener(e -> showLabels("Diet Labels", String.join(", ", recipe.getDietLabels() + "\n\n")));
         addLabelAndDetails(detailsPanel, gbc, "Meal Type:", " " + recipe.getMealType() + "\n\n");
         addLabelAndDetails(detailsPanel, gbc, "Cuisine Type:", " " + recipe.getCuisineType() + "\n\n");
         addLabelAndDetails(detailsPanel, gbc, "Ingredients:", " " + String.join(", ", recipe.getIngredients()) + "\n\n");
@@ -82,7 +82,7 @@ public class RecipeSeatchButtonPresenter implements RecipeSearchButtonOutputBoun
                 win.dispose();
             }
         });
-        Object[] options = {btnClose, btnSave};
+        Object[] options = {btnClose, btnSave, btnHealthLabels, btnDietLabels};
         JOptionPane.showOptionDialog(
                 null,
                 contentPanel,
@@ -108,16 +108,38 @@ public class RecipeSeatchButtonPresenter implements RecipeSearchButtonOutputBoun
         gbc.gridx = 0;
     }
 
+    private void showLabels(String title, String label) {
+        // Create a custom JPanel with BorderLayout
+        JPanel labelsPanel = new JPanel(new BorderLayout());
+
+        // Create a JPanel to hold the content
+        JPanel detailsPanel = new JPanel(new GridBagLayout());
+        detailsPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        // Add labels to the detailsPanel using GridBagLayout
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.ipady = 10;
+
+        addLabelAndDetails(detailsPanel, gbc, title + ":", " " + label + "\n\n");
+
+        // Add the detailsPanel to the labelsPanel
+        labelsPanel.add(new JScrollPane(detailsPanel), BorderLayout.CENTER);
+
+        // Show the labels panel
+        JOptionPane.showMessageDialog(view, labelsPanel, title, JOptionPane.PLAIN_MESSAGE);
+    }
+
 
     @Override
     public void presentnoinputfail() {
         JOptionPane.showMessageDialog(view, String.format("Please Enter Minimum One Field!!!"));
-
     }
 
     @Override
     public void presentnoresultfail() {
         JOptionPane.showMessageDialog(view, String.format("No Result Found!!! Please Try Again"));
-
     }
 }

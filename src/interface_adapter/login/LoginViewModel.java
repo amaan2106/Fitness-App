@@ -16,19 +16,27 @@ public class LoginViewModel extends ViewModel {
 
     private LoginState state = new LoginState();
 
+
+
     public LoginViewModel() {
         super("log in");
+        System.out.println("LoginViewModel created");
     }
 
     public void setState(LoginState state) {
-        this.state = state;
+        this.state = state;// Make sure this line is present
     }
+
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     // This is what the Signup Presenter will call to let the ViewModel know
     // to alert the View
     public void firePropertyChanged() {
+        // Update the login state here if needed
+        // For example, you might want to set the loggedIn property based on some condition
+        this.state.setLoggedIn(true);
+
         support.firePropertyChange("state", null, this.state);
     }
 

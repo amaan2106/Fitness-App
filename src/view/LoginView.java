@@ -19,6 +19,9 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
     private final ViewManagerModel viewManagerModel; // Add this field
 
     public final String viewName = "log in";
+
+    private final JLabel errorMessageField = new JLabel(); // Add this field
+
     private final LoginViewModel loginViewModel;
 
     final JTextField usernameInputField = new JTextField(15);
@@ -37,6 +40,7 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         this.loginController = controller;
         this.loginViewModel = loginViewModel;
         this.loginViewModel.addPropertyChangeListener(this);
+
 
         JLabel title = new JLabel("Login Screen");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -115,39 +119,29 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         this.add(passwordInfo);
         this.add(passwordErrorField);
         this.add(buttons);
+
+        this.add(errorMessageField); // Add the error message field to the panel
     }
 
     /**
      * React to a button click that results in evt.
      */
+
+    @Override
     public void actionPerformed(ActionEvent evt) {
-
-//        viewManagerModel.setActiveView("start page"); // Use the view name of StartPageView
-//        viewManagerModel.firePropertyChanged();
-
         if (evt.getSource().equals(logIn)) {
             LoginState currentState = loginViewModel.getState();
             loginController.execute(
                     currentState.getUsername(),
                     currentState.getPassword()
             );
-            // Check if login is successful
-            // Update StartPageState with the logged-in user's details
-            currentState.setUsername(currentState.getUsername()); // Assuming there's a method to set login status
-            loginViewModel.setState(currentState);
-//            this.viewManagerModel.setLoggedInUsername(currentState.getUsername());
-
-            // Switch to StartPageView
-//            this.viewManagerModel.setActiveView("start page");
-//            this.viewManagerModel.firePropertyChanged();
-        }
-        if (evt.getSource().equals(cancel)) {
-            viewManagerModel.setActiveView("start page"); // Use the view name of StartPageView
+            // Debugging: Check if the state is updated correctly
+        } else if (evt.getSource().equals(cancel)) {
+            viewManagerModel.setActiveView("start page");
             viewManagerModel.firePropertyChanged();
-
         }
-
     }
+
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -155,10 +149,23 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
         setFields(state);
         state.setUsername(usernameInputField.getText());
         loginViewModel.setState(state);
-        viewManagerModel.setActiveView("start page"); // Use the view name of StartPageView
 
+        if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
+            errorMessageField.setText(state.getErrorMessage());
+        } else {
+            errorMessageField.setText(""); // Clear the error message
+        }
 
+        if (state.isLoggedIn()) {
+            viewManagerModel.setActiveView("start page");
+            viewManagerModel.setLoggedInUsername(state.getUsername());
+            viewManagerModel.firePropertyChanged();
+        } else {
+            System.out.println("Not Logged in ");
+        }
     }
+
+
 
     private void setFields(LoginState state) {
         usernameInputField.setText(state.getUsername());

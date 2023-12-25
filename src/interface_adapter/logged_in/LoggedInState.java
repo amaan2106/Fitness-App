@@ -16,4 +16,9 @@ public class LoggedInState {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    public boolean isLoggedIn() {
+        // Assuming a user is considered logged in if the username is not empty
+        return !username.isEmpty();
+    }
 }

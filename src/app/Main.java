@@ -12,6 +12,7 @@ import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.login.LoginState;
 import interface_adapter.MealPlanner.MealPlanViewModel;
 import interface_adapter.MealPlanner.MealPlanController;
 import DataAccess.MDataAccess;
@@ -53,7 +54,8 @@ public class Main {
         CalorieCounterViewModel calorieCounterViewModel = new CalorieCounterViewModel();
 
         LoginViewModel loginViewModel = new LoginViewModel();
-        LoggedInViewModel loggedInViewModel = new LoggedInViewModel();
+        LoginState loginState = new LoginState();
+        LoggedInViewModel loggedInViewModel = new LoggedInViewModel(loginState);
         SignupViewModel signupViewModel = new SignupViewModel();
 
         FileUserDataAccessObject userDataAccessObject;
@@ -71,7 +73,28 @@ public class Main {
         views.add(recipePageView, recipePageView.viewName);
 
 
-        StartPageView startPageView = StartPageUseCaseFactory.create(viewManagerModel, startPageViewModel, recipePageViewModel, workoutViewModel, loginViewModel,signupViewModel, calorieCounterViewModel );
+        LoggedInView loggedInView = new LoggedInView(
+                viewManagerModel,
+                loggedInViewModel,
+                loginViewModel,
+                signupViewModel
+        );
+        views.add(loggedInView, loggedInView.viewName);
+
+        // Create StartPageView instance
+        StartPageView startPageView = StartPageUseCaseFactory.create(
+                viewManagerModel,
+                startPageViewModel,
+                recipePageViewModel,
+                workoutViewModel,
+                calorieCounterViewModel,
+                loggedInView,
+                loggedInViewModel
+        );
+
+        // Set ViewManagerModel and LoggedInView
+        startPageView.setViewManagerAndLoggedIn(viewManagerModel, loggedInView);
+
 
         startPageView.setBackground(Color.BLACK);
 
@@ -84,8 +107,6 @@ public class Main {
         LoginView loginView = LoginUseCaseFactory.create(viewManagerModel, loginViewModel, loggedInViewModel, userDataAccessObject);
         views.add(loginView, loginView.viewName);
 
-        LoggedInView loggedInView = new LoggedInView(viewManagerModel, loggedInViewModel);
-        views.add(loggedInView, loggedInView.viewName);
 
         WorkoutView workoutView = new WorkoutView(workoutViewModel, viewManagerModel, startPageViewModel, searchByMuscleViewModel, searchWorkoutByNameViewModel);
         views.add(workoutView, workoutView.viewName);
@@ -102,7 +123,7 @@ public class Main {
         MealPlanView mealPlanView = MealPlanUseCaseFactory.create(viewManagerModel, application);
         views.add(mealPlanView, mealPlanView.viewName);
 
-        viewManagerModel.setActiveView(startPageView.viewName);
+        viewManagerModel.setActiveView(loggedInView.viewName); // Set the active view to loggedInView
         viewManagerModel.firePropertyChanged();
 
         application.pack();
