@@ -48,6 +48,8 @@ public class Main {
         ViewManagerModel viewManagerModel = new ViewManagerModel();
         new ViewManager(views, cardLayout, viewManagerModel);
 
+        //testing something rq
+
         StartPageViewModel startPageViewModel = new StartPageViewModel();
         RecipePageViewModel recipePageViewModel = new RecipePageViewModel();
 
